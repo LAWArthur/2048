@@ -9,6 +9,9 @@ import torch.nn.functional as F
 import copy
 
 device = 'cpu'
+if torch.cuda.is_available():
+    device = torch.device('cuda')
+
 model = Model2048(Model2048Config())
 model.load_state_dict(torch.load('checkpoint.pt'))
 model.to(device)
