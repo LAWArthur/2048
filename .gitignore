@@ -1,0 +1,4 @@
+2048-venv/*
+__pycache__/*
+checkpoint.pt
+test.ipynb
