@@ -86,7 +86,7 @@ def trainstep(step):
 
     y_pred = model(x)
 
-    errors = (y_pred - y).detach().numpy()
+    errors = (y_pred - y).detach().cpu().numpy()
     memory.update(indices, errors)
 
     loss = F.mse_loss(y_pred.float(), y.float())
