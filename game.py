@@ -61,7 +61,7 @@ class Game:
                     k += 1
 
     def step(self, action, isPrint = False):
-        reward = -0.1
+        reward = 0
         board_t = self.board.copy()
         if action % 2 == 1: board_t = board_t.T
         if action // 2 == 1: board_t = np.flip(board_t, axis=1)
@@ -79,12 +79,15 @@ class Game:
 
         if action // 2 == 1: board_t = np.flip(board_t, axis=1)
         if action % 2 == 1: board_t = board_t.T
+        punish_flag = False
+        if (self.board == board_t).all(): punish_flag = True # 惩罚无效移动
         self.board = board_t
         self.generate()
         self.score += reward
         self.done = not self.check()
-        if self.done:
-            reward = -0.9999
+        reward = np.log2(reward + 0.9)
+        if self.done or punish_flag:
+            reward = -10
         if isPrint : self.printBoard()
         return self.board.reshape((16)), reward, self.done
 

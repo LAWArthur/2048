@@ -15,6 +15,7 @@ if torch.cuda.is_available():
 
 model = Model2048(Model2048Config())
 # model.load_state_dict(torch.load('checkpoint.pt'))
+model.compile(backend='eager')
 model.to(device)
 model.train()
 evalmodel: Model2048 = None
@@ -22,7 +23,7 @@ evalmodel: Model2048 = None
 epochs = 10000
 model_update_steps = 100
 eps = 0.999
-fall = 0.999
+fall = 0.99999
 gamma = 0.5
 batch_size = 256
 
@@ -68,7 +69,7 @@ def bestaction(model, curstate):
 def trainstep(step):
     if(len(memory.memory) <= batch_size): return
     indices = memory.sample(batch_size)
-    print(indices)
+    # print(indices)
     x = []
     y = []
     # print(indices)
@@ -118,9 +119,7 @@ for epoch in range(epochs):
             action = np.random.randint(0,4)
         
         newstate, reward, terminated = Game(curstate).step(action)
-        reward = math.log2(reward + 1) / 16
-
-        memory.add((curstate, action, reward, terminated))
+        memory.add((np.log2(curstate+1, dtype=np.float32), action, reward, terminated))
         curstate = newstate
         eps *= fall
 
