@@ -22,9 +22,10 @@ evalmodel: Model2048 = None
 
 epochs = 10000
 model_update_steps = 100
-eps = 0.999
-fall = 0.99999
-gamma = 0.5
+eps0 = 0.7
+fall = 0.99
+inc = 1.005
+gamma = 0.9
 batch_size = 256
 
 
@@ -102,9 +103,9 @@ def trainstep(step):
 step = 0
 for epoch in range(epochs):
     curstate = Game().reset()
+    eps = eps0
     while True:
         
-
         if step % model_update_steps == 0:
             print('evalmodel updated!')
             evalmodel = copy.deepcopy(model)
@@ -121,8 +122,8 @@ for epoch in range(epochs):
         newstate, reward, terminated = Game(curstate).step(action)
         memory.add((np.log2(curstate+1, dtype=np.float32), action, reward, terminated))
         curstate = newstate
-        eps *= fall
-
+        
+        eps*=inc
         print(f'step {step} | reward: {reward:.4f}')
 
         trainstep(step)
@@ -130,3 +131,4 @@ for epoch in range(epochs):
         step += 1
 
         if terminated: break
+    eps0 *= fall
